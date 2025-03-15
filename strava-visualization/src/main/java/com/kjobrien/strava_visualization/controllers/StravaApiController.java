@@ -24,14 +24,24 @@ public class StravaApiController {
         return stravaApiService.getAthleteStats();
     }
 
-    @GetMapping("/runs")
-    public int getRunCount()  {
-        return stravaApiService.getRunCount();
-    }
-
     @GetMapping("/refresh")
     public String refreshStats()  {
         return stravaApiService.refreshStats();
+    }
+
+    @GetMapping("/distance")
+    public double getDistanceRan()  {
+        return stravaApiService.getTotalDistance();
+    }
+
+    @GetMapping("/time")
+    public long getTotalTime()  {
+        return stravaApiService.getTotalTime();
+    }
+
+    @GetMapping("/run-count")
+    public int getTotalRuns()  {
+        return stravaApiService.getTotalRuns();
     }
 
 

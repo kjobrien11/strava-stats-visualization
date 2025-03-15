@@ -17,6 +17,9 @@ public class StavaApi {
     private JsonNode jsonResposne;
     private String token;
     long expirationEpoch;
+    int totalRuns;
+    long workoutTimeInSeconds;
+    double totalDistanceInMeters;
 
     //total distance
     //total time
@@ -26,6 +29,7 @@ public class StavaApi {
         System.out.println("Epoch Seconds: " + currentEpochSeconds);
         refrehToken();
         initializeStats();
+        generateStats();
     }
 
     public void refrehToken() {
@@ -88,5 +92,36 @@ public class StavaApi {
 
     public JsonNode getJsonReponse() {
         return jsonResposne;
+    }
+
+    private void generateStats(){
+        int workoutCount = 0;
+        long seconds = 0;
+        double distance = 0;
+
+        if (jsonResposne.isArray()) {
+            for (JsonNode activityNode : jsonResposne) {
+                if(activityNode.path("name").asText().endsWith("Run")){
+                    workoutCount++;
+                    seconds += activityNode.path("moving_time").asLong();
+                    distance += activityNode.path("distance").asDouble();
+                }
+            }
+            totalRuns = workoutCount;
+            workoutTimeInSeconds = seconds;
+            totalDistanceInMeters = distance;
+        }
+    }
+
+    public double getTotalDistance(){
+        return totalDistanceInMeters;
+    }
+
+    public long getTotalWorkoutTime(){
+        return workoutTimeInSeconds;
+    }
+
+    public int getTotalRuns(){
+        return totalRuns;
     }
 }
