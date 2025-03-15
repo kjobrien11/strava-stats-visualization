@@ -15,6 +15,8 @@ public class StravaApiController {
         RestTemplate restTemplate = new RestTemplate();
 
         String token = System.getenv("API_KEY");
+
+        //Return 50 workouts after january 1st
         String url = "https://www.strava.com/api/v3/athlete/activities?after=1735707600&per_page=50";
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
