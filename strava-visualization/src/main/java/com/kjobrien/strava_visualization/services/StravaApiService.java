@@ -33,4 +33,9 @@ public class StravaApiService {
         return count;
     }
 
+    public String refreshStats(){
+        stavaApi.initializeStats();
+        return getAthleteStats();
+    }
+
 }

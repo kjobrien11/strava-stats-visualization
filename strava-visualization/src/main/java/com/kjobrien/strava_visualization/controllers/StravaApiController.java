@@ -29,6 +29,11 @@ public class StravaApiController {
         return stravaApiService.getRunCount();
     }
 
+    @GetMapping("/refresh")
+    public String refreshStats()  {
+        return stravaApiService.refreshStats();
+    }
+
 
 
 }

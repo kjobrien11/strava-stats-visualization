@@ -18,6 +18,9 @@ public class StavaApi {
     private String token;
     long expirationEpoch;
 
+    //total distance
+    //total time
+
     public StavaApi() {
         long currentEpochSeconds = Instant.now().getEpochSecond();
         System.out.println("Epoch Seconds: " + currentEpochSeconds);
