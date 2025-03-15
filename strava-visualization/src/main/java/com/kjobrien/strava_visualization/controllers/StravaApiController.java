@@ -1,4 +1,7 @@
 package com.kjobrien.strava_visualization.controllers;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -11,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class StravaApiController {
 
     @GetMapping
-    String getAthleteStats() {
+    String getAthleteStats() throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         String token = System.getenv("API_KEY");
@@ -27,6 +30,18 @@ public class StravaApiController {
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
         System.out.println(response.getBody());
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(response.getBody());
+
+        int count = 0;
+        if (rootNode.isArray()) {
+            for (JsonNode activityNode : rootNode) {
+                if(activityNode.path("name").asText().endsWith("Run")){
+                    count++;
+                }
+            }
+        }
+        System.out.println("Run Count: " + count);
         return response.getBody();
     }
 
