@@ -21,14 +21,11 @@ public class StavaApi {
     long workoutTimeInSeconds;
     double totalDistanceInMeters;
 
-    //total distance
-    //total time
-
     public StavaApi() {
         long currentEpochSeconds = Instant.now().getEpochSecond();
         System.out.println("Epoch Seconds: " + currentEpochSeconds);
         refrehToken();
-        initializeStats();
+        requestJson();
         generateStats();
     }
 
@@ -53,7 +50,7 @@ public class StavaApi {
         }
     }
 
-    public void initializeStats() {
+    public void requestJson() {
         try {
             String jsonBody = "{\"key\":\"value\"}";
             RestTemplate restTemplate = new RestTemplate();
@@ -113,11 +110,11 @@ public class StavaApi {
         }
     }
 
-    public double getTotalDistance(){
+    public double getTotalDistanceInMeters(){
         return totalDistanceInMeters;
     }
 
-    public long getTotalWorkoutTime(){
+    public long getTotalWorkoutTimeInSeconds(){
         return workoutTimeInSeconds;
     }
 
