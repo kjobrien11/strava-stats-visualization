@@ -20,8 +20,13 @@ public class StravaApiController {
     private StravaApiService stravaApiService;
 
     @GetMapping
-    public String getAthleteStats() throws JsonProcessingException {
+    public String getAthleteStats() {
         return stravaApiService.getAthleteStats();
+    }
+
+    @GetMapping("/runs")
+    public int getRunCount()  {
+        return stravaApiService.getRunCount();
     }
 
 

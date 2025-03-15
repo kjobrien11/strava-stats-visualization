@@ -20,7 +20,7 @@ public class StravaApiService {
         return stavaApi.getJsonReponse().toString();
     }
 
-    public int returnRunCount(){
+    public int getRunCount(){
         JsonNode rootNode = stavaApi.getJsonReponse();
         int count = 0;
         if (rootNode.isArray()) {

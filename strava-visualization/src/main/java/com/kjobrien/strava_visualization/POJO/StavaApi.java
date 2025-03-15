@@ -3,6 +3,7 @@ package com.kjobrien.strava_visualization.POJO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -15,7 +16,12 @@ public class StavaApi {
     private String url = "https://www.strava.com/api/v3/athlete/activities?after=1735707600&per_page=50";
     private JsonNode jsonResposne;
 
+
+
+
     public StavaApi() {
+        long currentEpochSeconds = Instant.now().getEpochSecond();
+        System.out.println("Epoch Seconds: " + currentEpochSeconds);
         initializeStats();
     }
 
