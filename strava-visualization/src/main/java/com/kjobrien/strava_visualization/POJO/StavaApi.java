@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.kjobrien.strava_visualization.dto.Workout;
 import org.springframework.http.HttpEntity;
@@ -22,6 +24,12 @@ public class StavaApi {
     int totalRuns;
     long workoutTimeInSeconds;
     double totalDistanceInMeters;
+
+    public List<Workout> getWorkouts() {
+        return workouts;
+    }
+
+    List<Workout> workouts = new ArrayList<Workout>();
 
     public StavaApi() {
         long currentEpochSeconds = Instant.now().getEpochSecond();
@@ -119,6 +127,7 @@ public class StavaApi {
                     }
 
                     Workout current = new Workout(distanceRan, timeInSeconds, type, date, averageSpeed, topSpeed, averageHeartRate);
+                    workouts.add(current);
                     System.out.println(current);
                 }
             }

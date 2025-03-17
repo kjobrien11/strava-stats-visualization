@@ -1,18 +1,21 @@
 package com.kjobrien.strava_visualization.services;
 
 import com.kjobrien.strava_visualization.POJO.StavaApi;
+import com.kjobrien.strava_visualization.dto.Workout;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class StravaApiService {
 
     StavaApi stavaApi = new StavaApi();
 
-    public String getAthleteStats() {
-        return stavaApi.getJsonReponse().toString();
+    public List<Workout> getAthleteStats() {
+        return stavaApi.getWorkouts();
     }
 
-    public String refreshStats(){
+    public List<Workout> refreshStats(){
         stavaApi.requestJson();
         return getAthleteStats();
     }
