@@ -11,7 +11,7 @@ public class StravaApiController {
     @Autowired
     private StravaApiService stravaApiService;
 
-    @GetMapping
+    @GetMapping("/stats")
     public String getAthleteStats() {
         return stravaApiService.getAthleteStats();
     }
