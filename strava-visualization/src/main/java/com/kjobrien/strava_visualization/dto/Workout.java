@@ -74,4 +74,17 @@ public class Workout {
     public void setAverageHeartRate(double averageHeartRate) {
         this.averageHeartRate = averageHeartRate;
     }
+
+    @Override
+    public String toString() {
+        return "Workout{" +
+                "distance=" + distance +
+                ", timeInSeconds=" + timeInSeconds +
+                ", type='" + type + '\'' +
+                ", date='" + date + '\'' +
+                ", averageSpeed=" + averageSpeed +
+                ", topSpeed=" + topSpeed +
+                ", averageHeartRate=" + averageHeartRate +
+                '}';
+    }
 }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
+
+import com.kjobrien.strava_visualization.dto.Workout;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -100,9 +102,24 @@ public class StavaApi {
         if (jsonResposne.isArray()) {
             for (JsonNode activityNode : jsonResposne) {
                 if(activityNode.path("type").asText().equals("Run")){
+
                     workoutCount++;
                     seconds += activityNode.path("moving_time").asLong();
                     distance += activityNode.path("distance").asDouble();
+
+                    double distanceRan = activityNode.path("distance").asDouble();
+                    long timeInSeconds = activityNode.path("moving_time").asLong();
+                    String type = activityNode.path("type").asText();
+                    String date = activityNode.path("start_date").asText();
+                    double averageSpeed = activityNode.path("average_speed").asDouble();
+                    double topSpeed = activityNode.path("max_speed").asDouble();
+                    double averageHeartRate = 0;
+                    if(activityNode.path("has_heartrate").asBoolean()){
+                        averageHeartRate = activityNode.path("average_heartrate").asDouble();
+                    }
+
+                    Workout current = new Workout(distanceRan, timeInSeconds, type, date, averageSpeed, topSpeed, averageHeartRate);
+                    System.out.println(current);
                 }
             }
             totalRuns = workoutCount;
