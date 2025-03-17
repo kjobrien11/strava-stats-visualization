@@ -21,6 +21,10 @@ public class StravaApiService {
         return stavaApi.getTotalDistanceInMeters();
     }
 
+    public double getTotalDistanceInMiles()  {
+        return stavaApi.getTotalDistanceInMeters()/1609.0;
+    }
+
     public long getTotalWorkoutTimeInSeconds()  {
         return stavaApi.getTotalWorkoutTimeInSeconds();
     }

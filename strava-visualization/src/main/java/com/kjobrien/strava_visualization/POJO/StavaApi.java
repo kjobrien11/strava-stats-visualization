@@ -30,6 +30,7 @@ public class StavaApi {
     }
 
     public void refrehToken() {
+        System.out.println("Refreshing Token");
         try {
             String jsonBody = "{\"key\":\"value\"}";
             RestTemplate restTemplate = new RestTemplate();
@@ -38,7 +39,7 @@ public class StavaApi {
             String urlWithParams = UriComponentsBuilder.fromHttpUrl("https://www.strava.com/oauth/token")
                     .queryParam("client_id", System.getenv("CLIENT_ID"))
                     .queryParam("client_secret", System.getenv("CLIENT_SECRET"))
-                    .queryParam("refresh_token", System.getenv("STRAVA_REFRESH_TOKEN"))
+                    .queryParam("refresh_token", System.getenv("REFRESH_TOKEN"))
                     .queryParam("grant_type", "refresh_token")
                     .toUriString();
             HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
@@ -98,7 +99,7 @@ public class StavaApi {
 
         if (jsonResposne.isArray()) {
             for (JsonNode activityNode : jsonResposne) {
-                if(activityNode.path("name").asText().endsWith("Run")){
+                if(activityNode.path("type").asText().equals("Run")){
                     workoutCount++;
                     seconds += activityNode.path("moving_time").asLong();
                     distance += activityNode.path("distance").asDouble();

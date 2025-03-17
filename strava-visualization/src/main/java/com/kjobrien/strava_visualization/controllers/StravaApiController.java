@@ -21,9 +21,14 @@ public class StravaApiController {
         return stravaApiService.refreshStats();
     }
 
-    @GetMapping("/distance")
+    @GetMapping("/distance-meters")
     public double getTotalDistanceInMeters()  {
         return stravaApiService.getTotalDistanceInMeters();
+    }
+
+    @GetMapping("/distance-miles")
+    public double getTotalDistanceInMiles()  {
+        return stravaApiService.getTotalDistanceInMiles();
     }
 
     @GetMapping("/time")
