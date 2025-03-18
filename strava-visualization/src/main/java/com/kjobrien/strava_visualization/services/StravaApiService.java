@@ -9,7 +9,8 @@ import java.util.List;
 @Service
 public class StravaApiService {
 
-    StavaApi stravaApi = new StavaApi();
+    //January 1, 2025 & 50 activities
+    StavaApi stravaApi = new StavaApi(1735707600, 50);
 
     public List<Workout> getAthleteStats() {
         return stravaApi.getWorkouts();

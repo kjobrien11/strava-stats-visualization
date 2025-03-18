@@ -17,21 +17,33 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 public class StavaApi {
 
+    private long startEpoch =1735707600;
+    private int activitiesPerPage = 50;
     private String activities_url = "https://www.strava.com/api/v3/athlete/activities?after=1735707600&per_page=50";
     private JsonNode jsonResposne;
     private String token;
-    long expirationEpoch;
-    int totalRuns;
-    long workoutTimeInSeconds;
-    double totalDistanceInMeters;
+    private long expirationEpoch;
+    private int totalRuns;
+    private long workoutTimeInSeconds;
+    private double totalDistanceInMeters;
+    private List<Workout> workouts = new ArrayList<Workout>();
 
     public List<Workout> getWorkouts() {
         return workouts;
     }
 
-    List<Workout> workouts = new ArrayList<Workout>();
-
     public StavaApi() {
+        setUpApi();
+    }
+
+    public StavaApi(long startEpoch, int activitiesPerPage) {
+        this.startEpoch = startEpoch;
+        this.activitiesPerPage = activitiesPerPage;
+        this.activities_url = "https://www.strava.com/api/v3/athlete/activities?after=" + startEpoch +"&per_page="+activitiesPerPage;
+        setUpApi();
+    }
+
+    private void setUpApi(){
         long currentEpochSeconds = Instant.now().getEpochSecond();
         System.out.println("Epoch Seconds: " + currentEpochSeconds);
         refrehToken();

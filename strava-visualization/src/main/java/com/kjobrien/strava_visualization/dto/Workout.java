@@ -1,13 +1,14 @@
 package com.kjobrien.strava_visualization.dto;
 
 public class Workout {
-    double distance;
-    long timeInSeconds;
-    String type;
-    String date;
-    double averageSpeed;
-    double topSpeed;
-    double averageHeartRate;
+
+    private double distance;
+    private long timeInSeconds;
+    private String type;
+    private String date;
+    private double averageSpeed;
+    private double topSpeed;
+    private double averageHeartRate;
 
     public Workout(double distance, long timeInSeconds, String type, String date, double averageSpeed, double topSpeed, double averageHeartRate) {
         this.distance = distance;

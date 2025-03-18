@@ -43,7 +43,4 @@ public class StravaApiController {
     public int getTotalRuns()  {
         return stravaApiService.getTotalRuns();
     }
-
-
-
 }
