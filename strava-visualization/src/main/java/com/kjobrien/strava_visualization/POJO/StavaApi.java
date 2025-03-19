@@ -167,11 +167,13 @@ public class StavaApi {
         double distance = 0;
         LocalDate startDate = LocalDate.of(2024, 12, 30);
         LocalDate endOfWeekDay = LocalDate.of(2025, 1, 6);
+        weeklyTotals.add(new WeekActivityDTO(0, startDate));
+
         for(int i = 0; i < workouts.size(); i++){
             if(workouts.get(i).getDate().isBefore(endOfWeekDay)){
                 distance+=workouts.get(i).getDistance();
             }else{
-                weeklyTotals.add(new WeekActivityDTO(distance, startDate));
+                weeklyTotals.add(new WeekActivityDTO(distance, startDate.plusWeeks(1)));
                 distance = workouts.get(i).getDistance();
                 startDate = startDate.plusWeeks(1);
                 endOfWeekDay= endOfWeekDay.plusWeeks(1);
