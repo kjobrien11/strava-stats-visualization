@@ -1,5 +1,6 @@
 package com.kjobrien.strava_visualization.controllers;
 
+import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
 import com.kjobrien.strava_visualization.dto.Workout;
 import com.kjobrien.strava_visualization.services.StravaApiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +45,10 @@ public class StravaApiController {
     @GetMapping("/run-count")
     public int getTotalRuns()  {
         return stravaApiService.getTotalRuns();
+    }
+
+    @GetMapping("/weekly-totals")
+    public List<WeekActivityDTO> generateWeekActivityTotals(){
+        return stravaApiService.generateWeekActivityTotals();
     }
 }

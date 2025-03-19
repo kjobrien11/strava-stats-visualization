@@ -1,6 +1,7 @@
 package com.kjobrien.strava_visualization.services;
 
 import com.kjobrien.strava_visualization.POJO.StavaApi;
+import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
 import com.kjobrien.strava_visualization.dto.Workout;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,10 @@ public class StravaApiService {
 
     public int getTotalRuns()  {
         return stravaApi.getTotalRuns();
+    }
+
+    public List<WeekActivityDTO> generateWeekActivityTotals(){
+        return stravaApi.generateWeekActivityTotals();
     }
 
 }

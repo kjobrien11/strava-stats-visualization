@@ -142,13 +142,11 @@ public class StavaApi {
 
                     Workout current = new Workout(distanceRan, timeInSeconds, type, LocalDate.parse(date.substring(0, 10)), averageSpeed, topSpeed, averageHeartRate);
                     workouts.add(current);
-                    System.out.println(LocalDate.parse(date.substring(0, 10)).getDayOfMonth());
                 }
             }
             totalRuns = workoutCount;
             workoutTimeInSeconds = seconds;
             totalDistanceInMeters = distance;
-            generateWeekActivityTotals();
         }
     }
 
@@ -165,8 +163,6 @@ public class StavaApi {
     }
 
     public List<WeekActivityDTO> generateWeekActivityTotals(){
-        System.out.println("Generating week activity totals");
-        System.out.println(workouts.size());
         List<WeekActivityDTO> weeklyTotals = new ArrayList<WeekActivityDTO>();
         double distance = 0;
         LocalDate startDate = LocalDate.of(2024, 12, 30);
@@ -174,18 +170,15 @@ public class StavaApi {
         for(int i = 0; i < workouts.size(); i++){
             if(workouts.get(i).getDate().isBefore(endOfWeekDay)){
                 distance+=workouts.get(i).getDistance();
-                System.out.println(distance);
             }else{
                 weeklyTotals.add(new WeekActivityDTO(distance, startDate));
                 distance = workouts.get(i).getDistance();
                 startDate = startDate.plusWeeks(1);
                 endOfWeekDay= endOfWeekDay.plusWeeks(1);
-                System.out.println(endOfWeekDay);
             }
 
         }
         weeklyTotals.add(new WeekActivityDTO(distance, startDate));
-        System.out.println(weeklyTotals);
         return weeklyTotals;
     }
 }
