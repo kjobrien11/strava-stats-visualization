@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
 import com.kjobrien.strava_visualization.dto.Workout;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -147,6 +148,7 @@ public class StavaApi {
             totalRuns = workoutCount;
             workoutTimeInSeconds = seconds;
             totalDistanceInMeters = distance;
+            generateWeekActivityTotals();
         }
     }
 
@@ -160,5 +162,30 @@ public class StavaApi {
 
     public int getTotalRuns(){
         return totalRuns;
+    }
+
+    public List<WeekActivityDTO> generateWeekActivityTotals(){
+        System.out.println("Generating week activity totals");
+        System.out.println(workouts.size());
+        List<WeekActivityDTO> weeklyTotals = new ArrayList<WeekActivityDTO>();
+        double distance = 0;
+        LocalDate startDate = LocalDate.of(2024, 12, 30);
+        LocalDate endOfWeekDay = LocalDate.of(2025, 1, 6);
+        for(int i = 0; i < workouts.size(); i++){
+            if(workouts.get(i).getDate().isBefore(endOfWeekDay)){
+                distance+=workouts.get(i).getDistance();
+                System.out.println(distance);
+            }else{
+                weeklyTotals.add(new WeekActivityDTO(distance, startDate));
+                distance = workouts.get(i).getDistance();
+                startDate = startDate.plusWeeks(1);
+                endOfWeekDay= endOfWeekDay.plusWeeks(1);
+                System.out.println(endOfWeekDay);
+            }
+
+        }
+        weeklyTotals.add(new WeekActivityDTO(distance, startDate));
+        System.out.println(weeklyTotals);
+        return weeklyTotals;
     }
 }
