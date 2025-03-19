@@ -1,16 +1,21 @@
 package com.kjobrien.strava_visualization.dto;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 public class Workout {
 
     private double distance;
     private long timeInSeconds;
     private String type;
-    private String date;
+    private LocalDate date;
     private double averageSpeed;
     private double topSpeed;
     private double averageHeartRate;
 
-    public Workout(double distance, long timeInSeconds, String type, String date, double averageSpeed, double topSpeed, double averageHeartRate) {
+    public Workout(double distance, long timeInSeconds, String type, LocalDate date, double averageSpeed, double topSpeed, double averageHeartRate) {
         this.distance = distance;
         this.timeInSeconds = timeInSeconds;
         this.type = type;
@@ -44,12 +49,12 @@ public class Workout {
         this.type = type;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
     public void setDate(String date) {
-        this.date = date;
+        this.date = LocalDate.parse(date.substring(0, 10));
     }
 
     public double getAverageSpeed() {

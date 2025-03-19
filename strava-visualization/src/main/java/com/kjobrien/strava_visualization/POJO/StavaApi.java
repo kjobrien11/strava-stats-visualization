@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,9 +126,9 @@ public class StavaApi {
 
                     workoutCount++;
                     seconds += activityNode.path("moving_time").asLong();
-                    distance += activityNode.path("distance").asDouble();
+                    distance += activityNode.path("distance").asDouble()/1609;
 
-                    double distanceRan = activityNode.path("distance").asDouble();
+                    double distanceRan = activityNode.path("distance").asDouble() /1609;
                     long timeInSeconds = activityNode.path("moving_time").asLong();
                     String type = activityNode.path("type").asText();
                     String date = activityNode.path("start_date").asText();
@@ -138,9 +139,9 @@ public class StavaApi {
                         averageHeartRate = activityNode.path("average_heartrate").asDouble();
                     }
 
-                    Workout current = new Workout(distanceRan, timeInSeconds, type, date, averageSpeed, topSpeed, averageHeartRate);
+                    Workout current = new Workout(distanceRan, timeInSeconds, type, LocalDate.parse(date.substring(0, 10)), averageSpeed, topSpeed, averageHeartRate);
                     workouts.add(current);
-                    System.out.println(current);
+                    System.out.println(LocalDate.parse(date.substring(0, 10)).getDayOfMonth());
                 }
             }
             totalRuns = workoutCount;
