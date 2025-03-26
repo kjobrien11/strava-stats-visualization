@@ -47,8 +47,13 @@ public class StravaApiController {
         return stravaApiService.getTotalRuns();
     }
 
+    @GetMapping("/cumulative-totals")
+    public List<WeekActivityDTO> getCumulativeDistance(){
+        return stravaApiService.getCumulativeDistance();
+    }
+
     @GetMapping("/weekly-totals")
-    public List<WeekActivityDTO> generateWeekActivityTotals(){
-        return stravaApiService.generateWeekActivityTotals();
+    public List<WeekActivityDTO> getWeeklyDistance(){
+        return stravaApiService.getWeeklyDistance();
     }
 }

@@ -29,6 +29,9 @@ public class StavaApi {
     private long workoutTimeInSeconds;
     private double totalDistanceInMeters;
     private List<Workout> workouts = new ArrayList<Workout>();
+    List<WeekActivityDTO> weeklyDistance = new ArrayList<WeekActivityDTO>();
+    List<WeekActivityDTO> cumulativeDistance = new ArrayList<WeekActivityDTO>();
+
 
     public List<Workout> getWorkouts() {
         return workouts;
@@ -51,6 +54,7 @@ public class StavaApi {
         refrehToken();
         requestJson();
         generateStats();
+        generateWeekActivityTotals();
     }
 
     public void refrehToken() {
@@ -150,6 +154,34 @@ public class StavaApi {
         }
     }
 
+    public void generateWeekActivityTotals(){
+
+        double distanceWeek = 0;
+        double distanceTotal = 0;
+        LocalDate startDate = LocalDate.of(2024, 12, 30);
+        LocalDate endOfWeekDay = LocalDate.of(2025, 1, 6);
+        weeklyDistance.add(new WeekActivityDTO(0, startDate));
+        cumulativeDistance.add(new WeekActivityDTO(0, startDate));
+
+        for(int i = 0; i < workouts.size(); i++){
+            if(workouts.get(i).getDate().isBefore(endOfWeekDay)){
+                distanceWeek+=workouts.get(i).getDistance();
+                distanceTotal+=workouts.get(i).getDistance();
+            }else{
+                weeklyDistance.add(new WeekActivityDTO(distanceWeek, startDate.plusWeeks(1)));
+                cumulativeDistance.add(new WeekActivityDTO(distanceTotal, startDate.plusWeeks(1)));
+                distanceWeek = workouts.get(i).getDistance();
+                distanceTotal +=workouts.get(i).getDistance();
+                startDate = startDate.plusWeeks(1);
+                endOfWeekDay= endOfWeekDay.plusWeeks(1);
+
+            }
+        }
+        weeklyDistance.add(new WeekActivityDTO(distanceWeek, startDate));
+        cumulativeDistance.add(new WeekActivityDTO(distanceTotal, startDate));
+
+    }
+
     public double getTotalDistanceInMeters(){
         return totalDistanceInMeters;
     }
@@ -162,25 +194,13 @@ public class StavaApi {
         return totalRuns;
     }
 
-    public List<WeekActivityDTO> generateWeekActivityTotals(){
-        List<WeekActivityDTO> weeklyTotals = new ArrayList<WeekActivityDTO>();
-        double distance = 0;
-        LocalDate startDate = LocalDate.of(2024, 12, 30);
-        LocalDate endOfWeekDay = LocalDate.of(2025, 1, 6);
-        weeklyTotals.add(new WeekActivityDTO(0, startDate));
-
-        for(int i = 0; i < workouts.size(); i++){
-            if(workouts.get(i).getDate().isBefore(endOfWeekDay)){
-                distance+=workouts.get(i).getDistance();
-            }else{
-                weeklyTotals.add(new WeekActivityDTO(distance, startDate.plusWeeks(1)));
-                distance = workouts.get(i).getDistance();
-                startDate = startDate.plusWeeks(1);
-                endOfWeekDay= endOfWeekDay.plusWeeks(1);
-            }
-
-        }
-        weeklyTotals.add(new WeekActivityDTO(distance, startDate));
-        return weeklyTotals;
+    public List<WeekActivityDTO> getWeeklyDistance() {
+        return weeklyDistance;
     }
+
+    public List<WeekActivityDTO> getCumulativeDistance() {
+        return cumulativeDistance;
+    }
+
+
 }

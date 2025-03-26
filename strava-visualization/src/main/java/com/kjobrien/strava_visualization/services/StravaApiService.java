@@ -39,8 +39,13 @@ public class StravaApiService {
         return stravaApi.getTotalRuns();
     }
 
-    public List<WeekActivityDTO> generateWeekActivityTotals(){
-        return stravaApi.generateWeekActivityTotals();
+    public List<WeekActivityDTO> getCumulativeDistance(){
+        return stravaApi.getCumulativeDistance();
+
+    }
+
+    public List<WeekActivityDTO> getWeeklyDistance(){
+        return stravaApi.getWeeklyDistance();
     }
 
 }
