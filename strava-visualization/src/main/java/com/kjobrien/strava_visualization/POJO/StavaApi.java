@@ -160,7 +160,6 @@ public class StavaApi {
         double distanceTotal = 0;
         LocalDate startDate = LocalDate.of(2024, 12, 30);
         LocalDate endOfWeekDay = LocalDate.of(2025, 1, 6);
-        weeklyDistance.add(new WeekActivityDTO(0, startDate));
         cumulativeDistance.add(new WeekActivityDTO(0, startDate));
 
         for(int i = 0; i < workouts.size(); i++){
