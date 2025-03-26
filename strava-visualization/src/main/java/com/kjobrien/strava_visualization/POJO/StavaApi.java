@@ -177,8 +177,8 @@ public class StavaApi {
 
             }
         }
-        weeklyDistance.add(new WeekActivityDTO(distanceWeek, startDate));
-        cumulativeDistance.add(new WeekActivityDTO(distanceTotal, startDate));
+        weeklyDistance.add(new WeekActivityDTO(distanceWeek, startDate.plusWeeks(1)));
+        cumulativeDistance.add(new WeekActivityDTO(distanceTotal, startDate.plusWeeks(1)));
 
     }
 
