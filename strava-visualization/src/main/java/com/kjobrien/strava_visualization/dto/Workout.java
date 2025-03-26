@@ -1,9 +1,6 @@
 package com.kjobrien.strava_visualization.dto;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 public class Workout {
 

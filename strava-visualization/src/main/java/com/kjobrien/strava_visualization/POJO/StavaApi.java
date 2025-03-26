@@ -32,7 +32,6 @@ public class StavaApi {
     List<WeekActivityDTO> weeklyDistance = new ArrayList<WeekActivityDTO>();
     List<WeekActivityDTO> cumulativeDistance = new ArrayList<WeekActivityDTO>();
 
-
     public List<Workout> getWorkouts() {
         return workouts;
     }
@@ -155,7 +154,6 @@ public class StavaApi {
     }
 
     public void generateWeekActivityTotals(){
-
         double distanceWeek = 0;
         double distanceTotal = 0;
         LocalDate startDate = LocalDate.of(2024, 12, 30);
