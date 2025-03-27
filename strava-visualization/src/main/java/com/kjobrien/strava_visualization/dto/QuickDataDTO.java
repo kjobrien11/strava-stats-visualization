@@ -5,10 +5,10 @@ public class QuickDataDTO {
     double value = 0;
     String units = "units";
 
-    public QuickDataDTO(String units, double value, String title) {
-        this.units = units;
-        this.value = value;
+    public QuickDataDTO(String title, double value, String units) {
         this.title = title;
+        this.value = value;
+        this.units = units;
     }
 
     public String getTitle() {

@@ -1,5 +1,6 @@
 package com.kjobrien.strava_visualization.controllers;
 
+import com.kjobrien.strava_visualization.dto.QuickDataDTO;
 import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
 import com.kjobrien.strava_visualization.dto.Workout;
 import com.kjobrien.strava_visualization.services.StravaApiService;
@@ -33,7 +34,7 @@ public class StravaApiController {
     }
 
     @GetMapping("/distance-miles")
-    public double getTotalDistanceInMiles()  {
+    public QuickDataDTO getTotalDistanceInMiles()  {
         return stravaApiService.getTotalDistanceInMiles();
     }
 

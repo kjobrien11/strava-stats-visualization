@@ -1,6 +1,7 @@
 package com.kjobrien.strava_visualization.services;
 
 import com.kjobrien.strava_visualization.POJO.StavaApi;
+import com.kjobrien.strava_visualization.dto.QuickDataDTO;
 import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
 import com.kjobrien.strava_visualization.dto.Workout;
 import org.springframework.stereotype.Service;
@@ -27,8 +28,8 @@ public class StravaApiService {
         return stravaApi.getTotalDistanceInMiles()*1609.0;
     }
 
-    public double getTotalDistanceInMiles()  {
-        return stravaApi.getTotalDistanceInMiles();
+    public QuickDataDTO getTotalDistanceInMiles()  {
+        return new QuickDataDTO("Total Distance Ran",  stravaApi.getTotalDistanceInMiles(), "Miles");
     }
 
     public long getTotalWorkoutTimeInSeconds()  {
