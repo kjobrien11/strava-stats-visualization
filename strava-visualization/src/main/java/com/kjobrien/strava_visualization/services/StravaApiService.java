@@ -24,11 +24,11 @@ public class StravaApiService {
     }
 
     public double getTotalDistanceInMeters(){
-        return stravaApi.getTotalDistanceInMeters();
+        return stravaApi.getTotalDistanceInMiles()*1609.0;
     }
 
     public double getTotalDistanceInMiles()  {
-        return stravaApi.getTotalDistanceInMeters()/1609.0;
+        return stravaApi.getTotalDistanceInMiles();
     }
 
     public long getTotalWorkoutTimeInSeconds()  {

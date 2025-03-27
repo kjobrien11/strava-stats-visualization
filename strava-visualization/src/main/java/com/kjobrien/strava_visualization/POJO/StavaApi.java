@@ -27,7 +27,7 @@ public class StavaApi {
     private long expirationEpoch;
     private int totalRuns;
     private long workoutTimeInSeconds;
-    private double totalDistanceInMeters;
+    private double totalDistanceInMiles;
     private List<Workout> workouts = new ArrayList<Workout>();
     List<WeekActivityDTO> weeklyDistance = new ArrayList<WeekActivityDTO>();
     List<WeekActivityDTO> cumulativeDistance = new ArrayList<WeekActivityDTO>();
@@ -149,7 +149,7 @@ public class StavaApi {
             }
             totalRuns = workoutCount;
             workoutTimeInSeconds = seconds;
-            totalDistanceInMeters = distance;
+            totalDistanceInMiles = distance;
         }
     }
 
@@ -179,8 +179,8 @@ public class StavaApi {
 
     }
 
-    public double getTotalDistanceInMeters(){
-        return totalDistanceInMeters;
+    public double getTotalDistanceInMiles(){
+        return totalDistanceInMiles;
     }
 
     public long getTotalWorkoutTimeInSeconds(){
