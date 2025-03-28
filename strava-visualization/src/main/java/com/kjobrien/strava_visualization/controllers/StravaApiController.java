@@ -39,12 +39,12 @@ public class StravaApiController {
     }
 
     @GetMapping("/time")
-    public long getTotalWorkoutTimeInSeconds()  {
+    public QuickDataDTO getTotalWorkoutTimeInSeconds()  {
         return stravaApiService.getTotalWorkoutTimeInSeconds();
     }
 
     @GetMapping("/run-count")
-    public int getTotalRuns()  {
+    public QuickDataDTO getTotalRuns()  {
         return stravaApiService.getTotalRuns();
     }
 

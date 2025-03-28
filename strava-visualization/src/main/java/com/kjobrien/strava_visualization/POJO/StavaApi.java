@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kjobrien.strava_visualization.dto.QuickDataDTO;
 import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
 import com.kjobrien.strava_visualization.dto.Workout;
 import org.springframework.http.HttpEntity;
@@ -177,6 +178,10 @@ public class StavaApi {
         weeklyDistance.add(new WeekActivityDTO(distanceWeek, startDate.plusWeeks(1)));
         cumulativeDistance.add(new WeekActivityDTO(distanceTotal, startDate.plusWeeks(1)));
 
+    }
+
+    public QuickDataDTO createQuickDataItem(String title, double value, String units){
+        return new QuickDataDTO(title, value, units);
     }
 
     public double getTotalDistanceInMiles(){

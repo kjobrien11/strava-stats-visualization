@@ -29,15 +29,16 @@ public class StravaApiService {
     }
 
     public QuickDataDTO getTotalDistanceInMiles()  {
-        return new QuickDataDTO("Total Distance Ran",  stravaApi.getTotalDistanceInMiles(), "Miles");
+        return stravaApi.createQuickDataItem("Total Distance Ran",  stravaApi.getTotalDistanceInMiles(), "Miles");
     }
 
-    public long getTotalWorkoutTimeInSeconds()  {
-        return stravaApi.getTotalWorkoutTimeInSeconds();
+    public QuickDataDTO getTotalWorkoutTimeInSeconds()  {
+        return stravaApi.createQuickDataItem("Total Hours Ran",  ((double)stravaApi.getTotalWorkoutTimeInSeconds())/3600, "Hours");
     }
 
-    public int getTotalRuns()  {
-        return stravaApi.getTotalRuns();
+    public QuickDataDTO getTotalRuns()  {
+        return stravaApi.createQuickDataItem("Total Runs", stravaApi.getTotalRuns(), "Runs");
+
     }
 
     public List<WeekActivityDTO> getCumulativeDistance(){
