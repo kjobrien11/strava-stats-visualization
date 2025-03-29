@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kjobrien.strava_visualization.dto.QuickDataDTO;
+import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
 import com.kjobrien.strava_visualization.dto.Workout;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -25,8 +28,13 @@ public class StavaApi {
     private long expirationEpoch;
     private int totalRuns;
     private long workoutTimeInSeconds;
-    private double totalDistanceInMeters;
+    private double totalDistanceInMiles;
+    private double longestRunDistanceInMiles = 0;
+    private double sumAverageHeartRate = 0;
+    private double sumAverageSpeed = 0;
     private List<Workout> workouts = new ArrayList<Workout>();
+    List<WeekActivityDTO> weeklyDistance = new ArrayList<WeekActivityDTO>();
+    List<WeekActivityDTO> cumulativeDistance = new ArrayList<WeekActivityDTO>();
 
     public List<Workout> getWorkouts() {
         return workouts;
@@ -49,6 +57,7 @@ public class StavaApi {
         refrehToken();
         requestJson();
         generateStats();
+        generateWeekActivityTotals();
     }
 
     public void refrehToken() {
@@ -118,39 +127,77 @@ public class StavaApi {
         int workoutCount = 0;
         long seconds = 0;
         double distance = 0;
+        double totalHeartRateActivities = 0;
 
         if (jsonResposne.isArray()) {
             for (JsonNode activityNode : jsonResposne) {
                 if(activityNode.path("type").asText().equals("Run")){
-
                     workoutCount++;
                     seconds += activityNode.path("moving_time").asLong();
-                    distance += activityNode.path("distance").asDouble();
+                    distance += activityNode.path("distance").asDouble()/1609;
 
-                    double distanceRan = activityNode.path("distance").asDouble();
+                    double distanceRan = activityNode.path("distance").asDouble() /1609;
+                    if(distanceRan > longestRunDistanceInMiles){
+                        longestRunDistanceInMiles = distanceRan;
+                    }
                     long timeInSeconds = activityNode.path("moving_time").asLong();
                     String type = activityNode.path("type").asText();
                     String date = activityNode.path("start_date").asText();
                     double averageSpeed = activityNode.path("average_speed").asDouble();
+                    sumAverageSpeed += averageSpeed;
                     double topSpeed = activityNode.path("max_speed").asDouble();
                     double averageHeartRate = 0;
                     if(activityNode.path("has_heartrate").asBoolean()){
                         averageHeartRate = activityNode.path("average_heartrate").asDouble();
+                        sumAverageHeartRate += averageHeartRate;
+                        totalHeartRateActivities++;
                     }
 
-                    Workout current = new Workout(distanceRan, timeInSeconds, type, date, averageSpeed, topSpeed, averageHeartRate);
+                    Workout current = new Workout(distanceRan, timeInSeconds, type, LocalDate.parse(date.substring(0, 10)), averageSpeed, topSpeed, averageHeartRate);
                     workouts.add(current);
-                    System.out.println(current);
                 }
             }
             totalRuns = workoutCount;
             workoutTimeInSeconds = seconds;
-            totalDistanceInMeters = distance;
+            totalDistanceInMiles = distance;
+            sumAverageHeartRate = sumAverageHeartRate/totalHeartRateActivities;
+            sumAverageSpeed = sumAverageSpeed/totalRuns*2.237;
+
         }
     }
 
-    public double getTotalDistanceInMeters(){
-        return totalDistanceInMeters;
+    public void generateWeekActivityTotals(){
+        double distanceWeek = 0;
+        double distanceTotal = 0;
+        LocalDate startDate = LocalDate.of(2024, 12, 30);
+        LocalDate endOfWeekDay = LocalDate.of(2025, 1, 6);
+        cumulativeDistance.add(new WeekActivityDTO(0, startDate));
+
+        for(int i = 0; i < workouts.size(); i++){
+            if(workouts.get(i).getDate().isBefore(endOfWeekDay)){
+                distanceWeek+=workouts.get(i).getDistance();
+                distanceTotal+=workouts.get(i).getDistance();
+            }else{
+                weeklyDistance.add(new WeekActivityDTO(distanceWeek, startDate.plusWeeks(1)));
+                cumulativeDistance.add(new WeekActivityDTO(distanceTotal, startDate.plusWeeks(1)));
+                distanceWeek = workouts.get(i).getDistance();
+                distanceTotal +=workouts.get(i).getDistance();
+                startDate = startDate.plusWeeks(1);
+                endOfWeekDay= endOfWeekDay.plusWeeks(1);
+
+            }
+        }
+        weeklyDistance.add(new WeekActivityDTO(distanceWeek, startDate.plusWeeks(1)));
+        cumulativeDistance.add(new WeekActivityDTO(distanceTotal, startDate.plusWeeks(1)));
+
+    }
+
+    public QuickDataDTO createQuickDataItem(String title, double value, String units){
+        return new QuickDataDTO(title, value, units);
+    }
+
+    public double getTotalDistanceInMiles(){
+        return totalDistanceInMiles;
     }
 
     public long getTotalWorkoutTimeInSeconds(){
@@ -160,4 +207,26 @@ public class StavaApi {
     public int getTotalRuns(){
         return totalRuns;
     }
+
+    public double getLongestRunDistanceInMiles() {
+        return longestRunDistanceInMiles;
+    }
+
+    public double getSumAverageSpeed() {
+        return sumAverageSpeed;
+    }
+
+    public double getSumAverageHeartRate() {
+        return sumAverageHeartRate;
+    }
+
+    public List<WeekActivityDTO> getWeeklyDistance() {
+        return weeklyDistance;
+    }
+
+    public List<WeekActivityDTO> getCumulativeDistance() {
+        return cumulativeDistance;
+    }
+
+
 }

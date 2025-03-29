@@ -1,8 +1,11 @@
 package com.kjobrien.strava_visualization.services;
 
 import com.kjobrien.strava_visualization.POJO.StavaApi;
+import com.kjobrien.strava_visualization.dto.QuickDataDTO;
+import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
 import com.kjobrien.strava_visualization.dto.Workout;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
@@ -23,19 +26,44 @@ public class StravaApiService {
     }
 
     public double getTotalDistanceInMeters(){
-        return stravaApi.getTotalDistanceInMeters();
+        return stravaApi.getTotalDistanceInMiles()*1609.0;
     }
 
-    public double getTotalDistanceInMiles()  {
-        return stravaApi.getTotalDistanceInMeters()/1609.0;
+    public QuickDataDTO getTotalDistanceInMiles()  {
+        return stravaApi.createQuickDataItem("Total Distance Ran",  stravaApi.getTotalDistanceInMiles(), "Miles");
     }
 
-    public long getTotalWorkoutTimeInSeconds()  {
-        return stravaApi.getTotalWorkoutTimeInSeconds();
+    public QuickDataDTO getTotalWorkoutTimeInSeconds()  {
+        return stravaApi.createQuickDataItem("Total Hours Ran",  ((double)stravaApi.getTotalWorkoutTimeInSeconds())/3600, "Hours");
     }
 
-    public int getTotalRuns()  {
-        return stravaApi.getTotalRuns();
+    public QuickDataDTO getTotalRuns()  {
+        return stravaApi.createQuickDataItem("Total Runs", stravaApi.getTotalRuns(), "Runs");
     }
+
+    public QuickDataDTO getLongestRunDistanceInMiles()  {
+        return stravaApi.createQuickDataItem("Longest Run", stravaApi.getLongestRunDistanceInMiles(), "Miles");
+    }
+
+    public QuickDataDTO getAverageSpeed()  {
+        return stravaApi.createQuickDataItem("Average Speed", stravaApi.getSumAverageSpeed(), "MPH");
+
+    }
+
+    public QuickDataDTO getAverageHeartRate()  {
+        return stravaApi.createQuickDataItem("Average Heart Rate", stravaApi.getSumAverageHeartRate(), "BPM");
+
+    }
+
+    public List<WeekActivityDTO> getCumulativeDistance(){
+        return stravaApi.getCumulativeDistance();
+
+    }
+
+    public List<WeekActivityDTO> getWeeklyDistance(){
+        return stravaApi.getWeeklyDistance();
+    }
+
+
 
 }
