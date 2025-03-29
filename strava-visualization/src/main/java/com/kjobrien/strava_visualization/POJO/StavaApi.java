@@ -29,6 +29,9 @@ public class StavaApi {
     private int totalRuns;
     private long workoutTimeInSeconds;
     private double totalDistanceInMiles;
+    private double longestRunDistanceInMiles = 0;
+    private double sumAverageHeartRate = 0;
+    private double sumAverageSpeed = 0;
     private List<Workout> workouts = new ArrayList<Workout>();
     List<WeekActivityDTO> weeklyDistance = new ArrayList<WeekActivityDTO>();
     List<WeekActivityDTO> cumulativeDistance = new ArrayList<WeekActivityDTO>();
@@ -124,24 +127,30 @@ public class StavaApi {
         int workoutCount = 0;
         long seconds = 0;
         double distance = 0;
+        double totalHeartRateActivities = 0;
 
         if (jsonResposne.isArray()) {
             for (JsonNode activityNode : jsonResposne) {
                 if(activityNode.path("type").asText().equals("Run")){
-
                     workoutCount++;
                     seconds += activityNode.path("moving_time").asLong();
                     distance += activityNode.path("distance").asDouble()/1609;
 
                     double distanceRan = activityNode.path("distance").asDouble() /1609;
+                    if(distanceRan > longestRunDistanceInMiles){
+                        longestRunDistanceInMiles = distanceRan;
+                    }
                     long timeInSeconds = activityNode.path("moving_time").asLong();
                     String type = activityNode.path("type").asText();
                     String date = activityNode.path("start_date").asText();
                     double averageSpeed = activityNode.path("average_speed").asDouble();
+                    sumAverageSpeed += averageSpeed;
                     double topSpeed = activityNode.path("max_speed").asDouble();
                     double averageHeartRate = 0;
                     if(activityNode.path("has_heartrate").asBoolean()){
                         averageHeartRate = activityNode.path("average_heartrate").asDouble();
+                        sumAverageHeartRate += averageHeartRate;
+                        totalHeartRateActivities++;
                     }
 
                     Workout current = new Workout(distanceRan, timeInSeconds, type, LocalDate.parse(date.substring(0, 10)), averageSpeed, topSpeed, averageHeartRate);
@@ -151,6 +160,9 @@ public class StavaApi {
             totalRuns = workoutCount;
             workoutTimeInSeconds = seconds;
             totalDistanceInMiles = distance;
+            sumAverageHeartRate = sumAverageHeartRate/totalHeartRateActivities;
+            sumAverageSpeed = sumAverageSpeed/totalRuns;
+
         }
     }
 
@@ -194,6 +206,18 @@ public class StavaApi {
 
     public int getTotalRuns(){
         return totalRuns;
+    }
+
+    public double getLongestRunDistanceInMiles() {
+        return longestRunDistanceInMiles;
+    }
+
+    public double getSumAverageSpeed() {
+        return sumAverageSpeed;
+    }
+
+    public double getSumAverageHeartRate() {
+        return sumAverageHeartRate;
     }
 
     public List<WeekActivityDTO> getWeeklyDistance() {

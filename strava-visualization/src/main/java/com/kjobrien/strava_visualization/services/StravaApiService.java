@@ -5,6 +5,7 @@ import com.kjobrien.strava_visualization.dto.QuickDataDTO;
 import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
 import com.kjobrien.strava_visualization.dto.Workout;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
@@ -38,6 +39,19 @@ public class StravaApiService {
 
     public QuickDataDTO getTotalRuns()  {
         return stravaApi.createQuickDataItem("Total Runs", stravaApi.getTotalRuns(), "Runs");
+    }
+
+    public QuickDataDTO getLongestRunDistanceInMiles()  {
+        return stravaApi.createQuickDataItem("Longest Run", stravaApi.getLongestRunDistanceInMiles(), "Miles");
+    }
+
+    public QuickDataDTO getAverageSpeed()  {
+        return stravaApi.createQuickDataItem("Average Speed", stravaApi.getSumAverageSpeed(), "MPH");
+
+    }
+
+    public QuickDataDTO getAverageHeartRate()  {
+        return stravaApi.createQuickDataItem("Average Heart Rate", stravaApi.getSumAverageHeartRate(), "BPM");
 
     }
 
@@ -49,5 +63,7 @@ public class StravaApiService {
     public List<WeekActivityDTO> getWeeklyDistance(){
         return stravaApi.getWeeklyDistance();
     }
+
+
 
 }

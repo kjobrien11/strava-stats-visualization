@@ -57,4 +57,22 @@ public class StravaApiController {
     public List<WeekActivityDTO> getWeeklyDistance(){
         return stravaApiService.getWeeklyDistance();
     }
+
+    @GetMapping("/longest-run")
+    public QuickDataDTO getLongestRunDistanceInMiles()  {
+        return stravaApiService.getLongestRunDistanceInMiles();
+    }
+
+    @GetMapping("/average-speed")
+    public QuickDataDTO getAverageSpeed()  {
+        return stravaApiService.getAverageSpeed();
+    }
+
+    @GetMapping("/average-heartrate")
+    public QuickDataDTO getAverageHeartRate()  {
+        return stravaApiService.getAverageHeartRate();
+    }
+
+
+
 }
