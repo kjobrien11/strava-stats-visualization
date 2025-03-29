@@ -103,6 +103,8 @@ public class StavaApi {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             jsonResposne = objectMapper.readTree(response.getBody());
+//            generateStats();
+//            generateWeekActivityTotals();
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to parse JSON response", e);
         }
