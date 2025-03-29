@@ -161,7 +161,7 @@ public class StavaApi {
             workoutTimeInSeconds = seconds;
             totalDistanceInMiles = distance;
             sumAverageHeartRate = sumAverageHeartRate/totalHeartRateActivities;
-            sumAverageSpeed = sumAverageSpeed/totalRuns;
+            sumAverageSpeed = sumAverageSpeed/totalRuns*2.237;
 
         }
     }
