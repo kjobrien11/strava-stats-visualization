@@ -49,8 +49,6 @@ public class StavaApi {
     private double cumulativeAverageHeartRate = 0;
     private double cumulativeAverageSpeed = 0;
 
-
-
     //creates StravaApi and injects API values
     @Autowired
     public StavaApi(@Value("${api.refresh_token}") String refreshToken, @Value("${api.client_id}") String clientId, @Value("${api.client_secret}") String clientSecret) {
@@ -173,23 +171,24 @@ public class StavaApi {
         LocalDate startDate = LocalDate.of(2024, 12, 30);
         LocalDate endOfWeekDay = LocalDate.of(2025, 1, 6);
         lineChartData.add(new WeekActivityDTO(0, startDate));
+        startDate = startDate.plusWeeks(1);
 
-        for(int i = 0; i < runs.size(); i++){
-            if(runs.get(i).getDate().isBefore(endOfWeekDay)){
-                distanceWeek+= runs.get(i).getDistance();
-                distanceTotal+= runs.get(i).getDistance();
-            }else{
-                barChartData.add(new WeekActivityDTO(distanceWeek, startDate.plusWeeks(1)));
-                lineChartData.add(new WeekActivityDTO(distanceTotal, startDate.plusWeeks(1)));
-                distanceWeek = runs.get(i).getDistance();
-                distanceTotal += runs.get(i).getDistance();
+        for (Run run : runs) {
+            if (run.getDate().isBefore(endOfWeekDay)) {
+                distanceWeek += run.getDistance();
+                distanceTotal += run.getDistance();
+            } else {
+                barChartData.add(new WeekActivityDTO(distanceWeek, startDate));
+                lineChartData.add(new WeekActivityDTO(distanceTotal, startDate));
+                distanceWeek = run.getDistance();
+                distanceTotal += run.getDistance();
                 startDate = startDate.plusWeeks(1);
-                endOfWeekDay= endOfWeekDay.plusWeeks(1);
+                endOfWeekDay = endOfWeekDay.plusWeeks(1);
 
             }
         }
-        barChartData.add(new WeekActivityDTO(distanceWeek, startDate.plusWeeks(1)));
-        lineChartData.add(new WeekActivityDTO(distanceTotal, startDate.plusWeeks(1)));
+        barChartData.add(new WeekActivityDTO(distanceWeek, startDate));
+        lineChartData.add(new WeekActivityDTO(distanceTotal, startDate));
     }
 
     public QuickDataDTO createQuickDataItem(String title, double value, String units){
