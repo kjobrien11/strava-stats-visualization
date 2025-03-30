@@ -4,6 +4,7 @@ import com.kjobrien.strava_visualization.POJO.StavaApi;
 import com.kjobrien.strava_visualization.dto.QuickDataDTO;
 import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
 import com.kjobrien.strava_visualization.dto.Workout;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -13,7 +14,8 @@ import java.util.List;
 public class StravaApiService {
 
     //January 1, 2025 & 50 activities
-    StavaApi stravaApi = new StavaApi(1735707600, 50);
+    @Autowired
+    private StavaApi stravaApi;
 
     public List<Workout> getAthleteStats() {
         return stravaApi.getWorkouts();

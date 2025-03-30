@@ -7,17 +7,20 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.kjobrien.strava_visualization.dto.QuickDataDTO;
 import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
 import com.kjobrien.strava_visualization.dto.Workout;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+@Component
 public class StavaApi {
 
     private long startEpoch =1735707600;
@@ -35,21 +38,29 @@ public class StavaApi {
     private List<Workout> workouts = new ArrayList<Workout>();
     List<WeekActivityDTO> weeklyDistance = new ArrayList<WeekActivityDTO>();
     List<WeekActivityDTO> cumulativeDistance = new ArrayList<WeekActivityDTO>();
+    private final String refreshToken;
 
-    public List<Workout> getWorkouts() {
-        return workouts;
-    }
+    private final String clientId;
 
-    public StavaApi() {
+    private final String clientSecret;
+
+    @Autowired
+    public StavaApi(
+            @Value("${api.refresh_token}") String refreshToken,
+            @Value("${api.client_id}") String clientId,
+            @Value("${api.client_secret}") String clientSecret) {
+        this.refreshToken = refreshToken;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
         setUpApi();
     }
 
-    public StavaApi(long startEpoch, int activitiesPerPage) {
-        this.startEpoch = startEpoch;
-        this.activitiesPerPage = activitiesPerPage;
-        this.activities_url = "https://www.strava.com/api/v3/athlete/activities?after=" + startEpoch +"&per_page="+activitiesPerPage;
-        setUpApi();
-    }
+//    public StavaApi(long startEpoch, int activitiesPerPage) {
+//        this.startEpoch = startEpoch;
+//        this.activitiesPerPage = activitiesPerPage;
+//        this.activities_url = "https://www.strava.com/api/v3/athlete/activities?after=" + startEpoch +"&per_page="+activitiesPerPage;
+//        setUpApi();
+//    }
 
     private void setUpApi(){
         long currentEpochSeconds = Instant.now().getEpochSecond();
@@ -68,9 +79,9 @@ public class StavaApi {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "application/json");
             String urlWithParams = UriComponentsBuilder.fromHttpUrl("https://www.strava.com/oauth/token")
-                    .queryParam("client_id", System.getenv("CLIENT_ID"))
-                    .queryParam("client_secret", System.getenv("CLIENT_SECRET"))
-                    .queryParam("refresh_token", System.getenv("REFRESH_TOKEN"))
+                    .queryParam("client_id", clientId)
+                    .queryParam("client_secret", clientSecret)
+                    .queryParam("refresh_token", refreshToken)
                     .queryParam("grant_type", "refresh_token")
                     .toUriString();
             HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
@@ -220,6 +231,10 @@ public class StavaApi {
 
     public double getSumAverageHeartRate() {
         return sumAverageHeartRate;
+    }
+
+    public List<Workout> getWorkouts() {
+        return workouts;
     }
 
     public List<WeekActivityDTO> getWeeklyDistance() {
