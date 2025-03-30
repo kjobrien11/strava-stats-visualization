@@ -3,10 +3,9 @@ package com.kjobrien.strava_visualization.services;
 import com.kjobrien.strava_visualization.POJO.StavaApi;
 import com.kjobrien.strava_visualization.dto.QuickDataDTO;
 import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
-import com.kjobrien.strava_visualization.dto.Workout;
+import com.kjobrien.strava_visualization.dto.Run;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
@@ -17,13 +16,13 @@ public class StravaApiService {
     @Autowired
     private StavaApi stravaApi;
 
-    public List<Workout> getAthleteStats() {
-        return stravaApi.getWorkouts();
+    public List<Run> getAthleteStats() {
+        return stravaApi.getRuns();
     }
 
-    public List<Workout> refreshStats(){
-        stravaApi.refrehToken();
-        stravaApi.requestJson();
+    public List<Run> refreshStats(){
+        stravaApi.refreshAccessToken();
+        stravaApi.requestWorkoutsFromStrava();
         return getAthleteStats();
     }
 
@@ -48,24 +47,18 @@ public class StravaApiService {
     }
 
     public QuickDataDTO getAverageSpeed()  {
-        return stravaApi.createQuickDataItem("Average Speed", stravaApi.getSumAverageSpeed(), "MPH");
-
+        return stravaApi.createQuickDataItem("Average Speed", stravaApi.getCumulativeAverageSpeed(), "MPH");
     }
 
     public QuickDataDTO getAverageHeartRate()  {
-        return stravaApi.createQuickDataItem("Average Heart Rate", stravaApi.getSumAverageHeartRate(), "BPM");
-
+        return stravaApi.createQuickDataItem("Average Heart Rate", stravaApi.getCumulativeAverageHeartRate(), "BPM");
     }
 
     public List<WeekActivityDTO> getCumulativeDistance(){
-        return stravaApi.getCumulativeDistance();
-
+        return stravaApi.getLineChartData();
     }
 
     public List<WeekActivityDTO> getWeeklyDistance(){
-        return stravaApi.getWeeklyDistance();
+        return stravaApi.getBarChartData();
     }
-
-
-
 }
