@@ -31,7 +31,6 @@ public class StavaApi {
     private final String CLIENT_ID;
     private final String CLIENT_SECRET;
     private String ACCESS_TOKEN;
-    //    private long expirationEpoch;
 
     //Raw Data
     private final List<Run> runs = new ArrayList<>();
@@ -55,8 +54,6 @@ public class StavaApi {
         this.REFRESH_TOKEN = refreshToken;
         this.CLIENT_ID = clientId;
         this.CLIENT_SECRET = clientSecret;
-        long currentEpochSeconds = Instant.now().getEpochSecond();
-        System.out.println("Epoch Seconds: " + currentEpochSeconds);
         refreshAccessToken();
         requestWorkoutsFromStrava();
         formatRunsAndGenerateQuickData();
