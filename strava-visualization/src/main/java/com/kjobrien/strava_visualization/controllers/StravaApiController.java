@@ -1,5 +1,6 @@
 package com.kjobrien.strava_visualization.controllers;
 
+import com.kjobrien.strava_visualization.dto.QuickDataDTO;
 import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
 import com.kjobrien.strava_visualization.dto.Workout;
 import com.kjobrien.strava_visualization.services.StravaApiService;
@@ -33,17 +34,17 @@ public class StravaApiController {
     }
 
     @GetMapping("/distance-miles")
-    public double getTotalDistanceInMiles()  {
+    public QuickDataDTO getTotalDistanceInMiles()  {
         return stravaApiService.getTotalDistanceInMiles();
     }
 
     @GetMapping("/time")
-    public long getTotalWorkoutTimeInSeconds()  {
+    public QuickDataDTO getTotalWorkoutTimeInSeconds()  {
         return stravaApiService.getTotalWorkoutTimeInSeconds();
     }
 
     @GetMapping("/run-count")
-    public int getTotalRuns()  {
+    public QuickDataDTO getTotalRuns()  {
         return stravaApiService.getTotalRuns();
     }
 
@@ -56,4 +57,22 @@ public class StravaApiController {
     public List<WeekActivityDTO> getWeeklyDistance(){
         return stravaApiService.getWeeklyDistance();
     }
+
+    @GetMapping("/longest-run")
+    public QuickDataDTO getLongestRunDistanceInMiles()  {
+        return stravaApiService.getLongestRunDistanceInMiles();
+    }
+
+    @GetMapping("/average-speed")
+    public QuickDataDTO getAverageSpeed()  {
+        return stravaApiService.getAverageSpeed();
+    }
+
+    @GetMapping("/average-heartrate")
+    public QuickDataDTO getAverageHeartRate()  {
+        return stravaApiService.getAverageHeartRate();
+    }
+
+
+
 }
