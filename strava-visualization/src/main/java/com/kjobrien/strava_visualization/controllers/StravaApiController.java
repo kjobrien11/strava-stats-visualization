@@ -2,7 +2,7 @@ package com.kjobrien.strava_visualization.controllers;
 
 import com.kjobrien.strava_visualization.dto.QuickDataDTO;
 import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
-import com.kjobrien.strava_visualization.dto.Workout;
+import com.kjobrien.strava_visualization.dto.Run;
 import com.kjobrien.strava_visualization.services.StravaApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,12 +19,12 @@ public class StravaApiController {
     private StravaApiService stravaApiService;
 
     @GetMapping("/stats")
-    public List<Workout> getAthleteStats() {
+    public List<Run> getAthleteStats() {
         return stravaApiService.getAthleteStats();
     }
 
     @GetMapping("/refresh")
-    public List<Workout> refreshStats()  {
+    public List<Run> refreshStats()  {
         return stravaApiService.refreshStats();
     }
 

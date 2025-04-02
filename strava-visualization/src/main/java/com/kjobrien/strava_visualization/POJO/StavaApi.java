@@ -7,60 +7,64 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.kjobrien.strava_visualization.dto.QuickDataDTO;
 import com.kjobrien.strava_visualization.dto.WeekActivityDTO;
-import com.kjobrien.strava_visualization.dto.Workout;
+import com.kjobrien.strava_visualization.dto.Run;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+@Component
 public class StavaApi {
 
-    private long startEpoch =1735707600;
-    private int activitiesPerPage = 50;
-    private String activities_url = "https://www.strava.com/api/v3/athlete/activities?after=1735707600&per_page=50";
-    private JsonNode jsonResposne;
-    private String token;
-    private long expirationEpoch;
-    private int totalRuns;
-    private long workoutTimeInSeconds;
-    private double totalDistanceInMiles;
+    //Constants used for retrieving API data
+    private final long START_EPOCH =1735707600; // January 1st, 2025
+    private final int ACTIVITIES_PER_PAGE = 50;
+    private final String STRAVA_API_URL = "https://www.strava.com/api/v3/athlete/activities?after=+"+ START_EPOCH +"&per_page="+ ACTIVITIES_PER_PAGE;
+    private final String REFRESH_TOKEN;
+    private final String CLIENT_ID;
+    private final String CLIENT_SECRET;
+    private String ACCESS_TOKEN;
+    //    private long expirationEpoch;
+
+    //Raw Data
+    private final List<Run> runs = new ArrayList<>();
+    private JsonNode unformattedRuns;
+
+    //Chart Data
+    List<WeekActivityDTO> lineChartData = new ArrayList<>();
+    List<WeekActivityDTO> barChartData = new ArrayList<>();
+
+    //Quick Data
+    private int totalRuns = 0;
+    private long totalTimeInSeconds = 0;
+    private double totalDistanceInMiles = 0;
     private double longestRunDistanceInMiles = 0;
-    private double sumAverageHeartRate = 0;
-    private double sumAverageSpeed = 0;
-    private List<Workout> workouts = new ArrayList<Workout>();
-    List<WeekActivityDTO> weeklyDistance = new ArrayList<WeekActivityDTO>();
-    List<WeekActivityDTO> cumulativeDistance = new ArrayList<WeekActivityDTO>();
+    private double cumulativeAverageHeartRate = 0;
+    private double cumulativeAverageSpeed = 0;
 
-    public List<Workout> getWorkouts() {
-        return workouts;
-    }
-
-    public StavaApi() {
-        setUpApi();
-    }
-
-    public StavaApi(long startEpoch, int activitiesPerPage) {
-        this.startEpoch = startEpoch;
-        this.activitiesPerPage = activitiesPerPage;
-        this.activities_url = "https://www.strava.com/api/v3/athlete/activities?after=" + startEpoch +"&per_page="+activitiesPerPage;
-        setUpApi();
-    }
-
-    private void setUpApi(){
+    //creates StravaApi and injects API values
+    @Autowired
+    public StavaApi(@Value("${api.refresh_token}") String refreshToken, @Value("${api.client_id}") String clientId, @Value("${api.client_secret}") String clientSecret) {
+        this.REFRESH_TOKEN = refreshToken;
+        this.CLIENT_ID = clientId;
+        this.CLIENT_SECRET = clientSecret;
         long currentEpochSeconds = Instant.now().getEpochSecond();
         System.out.println("Epoch Seconds: " + currentEpochSeconds);
-        refrehToken();
-        requestJson();
-        generateStats();
-        generateWeekActivityTotals();
+        refreshAccessToken();
+        requestWorkoutsFromStrava();
+        formatRunsAndGenerateQuickData();
+        generateChartData();
     }
 
-    public void refrehToken() {
+    //Queries external Stava API to get the valid access token
+    public void refreshAccessToken() {
         System.out.println("Refreshing Token");
         try {
             String jsonBody = "{\"key\":\"value\"}";
@@ -68,69 +72,64 @@ public class StavaApi {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "application/json");
             String urlWithParams = UriComponentsBuilder.fromHttpUrl("https://www.strava.com/oauth/token")
-                    .queryParam("client_id", System.getenv("CLIENT_ID"))
-                    .queryParam("client_secret", System.getenv("CLIENT_SECRET"))
-                    .queryParam("refresh_token", System.getenv("REFRESH_TOKEN"))
+                    .queryParam("client_id", CLIENT_ID)
+                    .queryParam("client_secret", CLIENT_SECRET)
+                    .queryParam("refresh_token", REFRESH_TOKEN)
                     .queryParam("grant_type", "refresh_token")
                     .toUriString();
             HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
             ResponseEntity<String> response = restTemplate.exchange(urlWithParams, HttpMethod.POST, entity, String.class);
-            setToken(response);
+            setAccessToken(response);
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to resfresh token", e);
+            throw new RuntimeException("Failed to refresh token", e);
         }
     }
 
-    public void requestJson() {
-        try {
-            String jsonBody = "{\"key\":\"value\"}";
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Content-Type", "application/json");
-            headers.set("Authorization", "Bearer " + token);
-            HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(activities_url, HttpMethod.GET, entity, String.class);
-            setJsonReponse(response);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize Strava stats", e);
-        }
-    }
-
-    private void setJsonReponse(ResponseEntity<String> response) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            jsonResposne = objectMapper.readTree(response.getBody());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to parse JSON response", e);
-        }
-    }
-
-    private void setToken(ResponseEntity<String> response) {
+    //Sets the Strava Access Token
+    private void setAccessToken(ResponseEntity<String> response) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode responseJson = objectMapper.readTree(response.getBody());
-            token = responseJson.get("access_token").asText();
-            expirationEpoch =  responseJson.get("expires_at").asLong();
+            ACCESS_TOKEN = responseJson.get("access_token").asText();
+//            expirationEpoch =  responseJson.get("expires_at").asLong();
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Could not set token", e);
         }
     }
 
-    public JsonNode getJsonReponse() {
-        return jsonResposne;
+    public void requestWorkoutsFromStrava() {
+        try {
+            String jsonBody = "{\"key\":\"value\"}";
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Content-Type", "application/json");
+            headers.set("Authorization", "Bearer " + ACCESS_TOKEN);
+            HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
+            ResponseEntity<String> response = restTemplate.exchange(STRAVA_API_URL, HttpMethod.GET, entity, String.class);
+            setUnformattedRuns(response);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize Strava stats", e);
+        }
     }
 
-    private void generateStats(){
+    private void setUnformattedRuns(ResponseEntity<String> response) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            unformattedRuns = objectMapper.readTree(response.getBody());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to parse unformatted workouts", e);
+        }
+    }
+
+    private void formatRunsAndGenerateQuickData(){
         int workoutCount = 0;
         long seconds = 0;
         double distance = 0;
         double totalHeartRateActivities = 0;
 
-        if (jsonResposne.isArray()) {
-            for (JsonNode activityNode : jsonResposne) {
+        if (unformattedRuns.isArray()) {
+            for (JsonNode activityNode : unformattedRuns) {
                 if(activityNode.path("type").asText().equals("Run")){
                     workoutCount++;
                     seconds += activityNode.path("moving_time").asLong();
@@ -144,52 +143,52 @@ public class StavaApi {
                     String type = activityNode.path("type").asText();
                     String date = activityNode.path("start_date").asText();
                     double averageSpeed = activityNode.path("average_speed").asDouble();
-                    sumAverageSpeed += averageSpeed;
+                    cumulativeAverageSpeed += averageSpeed;
                     double topSpeed = activityNode.path("max_speed").asDouble();
                     double averageHeartRate = 0;
                     if(activityNode.path("has_heartrate").asBoolean()){
                         averageHeartRate = activityNode.path("average_heartrate").asDouble();
-                        sumAverageHeartRate += averageHeartRate;
+                        cumulativeAverageHeartRate += averageHeartRate;
                         totalHeartRateActivities++;
                     }
 
-                    Workout current = new Workout(distanceRan, timeInSeconds, type, LocalDate.parse(date.substring(0, 10)), averageSpeed, topSpeed, averageHeartRate);
-                    workouts.add(current);
+                    Run current = new Run(distanceRan, timeInSeconds, type, LocalDate.parse(date.substring(0, 10)), averageSpeed, topSpeed, averageHeartRate);
+                    runs.add(current);
                 }
             }
             totalRuns = workoutCount;
-            workoutTimeInSeconds = seconds;
+            totalTimeInSeconds = seconds;
             totalDistanceInMiles = distance;
-            sumAverageHeartRate = sumAverageHeartRate/totalHeartRateActivities;
-            sumAverageSpeed = sumAverageSpeed/totalRuns*2.237;
+            cumulativeAverageHeartRate = cumulativeAverageHeartRate /totalHeartRateActivities;
+            cumulativeAverageSpeed = cumulativeAverageSpeed /totalRuns*2.237;
 
         }
     }
 
-    public void generateWeekActivityTotals(){
+    public void generateChartData(){
         double distanceWeek = 0;
         double distanceTotal = 0;
         LocalDate startDate = LocalDate.of(2024, 12, 30);
         LocalDate endOfWeekDay = LocalDate.of(2025, 1, 6);
-        cumulativeDistance.add(new WeekActivityDTO(0, startDate));
+        lineChartData.add(new WeekActivityDTO(0, startDate));
+        startDate = startDate.plusWeeks(1);
 
-        for(int i = 0; i < workouts.size(); i++){
-            if(workouts.get(i).getDate().isBefore(endOfWeekDay)){
-                distanceWeek+=workouts.get(i).getDistance();
-                distanceTotal+=workouts.get(i).getDistance();
-            }else{
-                weeklyDistance.add(new WeekActivityDTO(distanceWeek, startDate.plusWeeks(1)));
-                cumulativeDistance.add(new WeekActivityDTO(distanceTotal, startDate.plusWeeks(1)));
-                distanceWeek = workouts.get(i).getDistance();
-                distanceTotal +=workouts.get(i).getDistance();
+        for (Run run : runs) {
+            if (run.getDate().isBefore(endOfWeekDay)) {
+                distanceWeek += run.getDistance();
+                distanceTotal += run.getDistance();
+            } else {
+                barChartData.add(new WeekActivityDTO(distanceWeek, startDate));
+                lineChartData.add(new WeekActivityDTO(distanceTotal, startDate));
+                distanceWeek = run.getDistance();
+                distanceTotal += run.getDistance();
                 startDate = startDate.plusWeeks(1);
-                endOfWeekDay= endOfWeekDay.plusWeeks(1);
+                endOfWeekDay = endOfWeekDay.plusWeeks(1);
 
             }
         }
-        weeklyDistance.add(new WeekActivityDTO(distanceWeek, startDate.plusWeeks(1)));
-        cumulativeDistance.add(new WeekActivityDTO(distanceTotal, startDate.plusWeeks(1)));
-
+        barChartData.add(new WeekActivityDTO(distanceWeek, startDate));
+        lineChartData.add(new WeekActivityDTO(distanceTotal, startDate));
     }
 
     public QuickDataDTO createQuickDataItem(String title, double value, String units){
@@ -201,7 +200,7 @@ public class StavaApi {
     }
 
     public long getTotalWorkoutTimeInSeconds(){
-        return workoutTimeInSeconds;
+        return totalTimeInSeconds;
     }
 
     public int getTotalRuns(){
@@ -212,21 +211,24 @@ public class StavaApi {
         return longestRunDistanceInMiles;
     }
 
-    public double getSumAverageSpeed() {
-        return sumAverageSpeed;
+    public double getCumulativeAverageSpeed() {
+        return cumulativeAverageSpeed;
     }
 
-    public double getSumAverageHeartRate() {
-        return sumAverageHeartRate;
+    public double getCumulativeAverageHeartRate() {
+        return cumulativeAverageHeartRate;
     }
 
-    public List<WeekActivityDTO> getWeeklyDistance() {
-        return weeklyDistance;
+    public List<Run> getRuns() {
+        return runs;
     }
 
-    public List<WeekActivityDTO> getCumulativeDistance() {
-        return cumulativeDistance;
+    public List<WeekActivityDTO> getBarChartData() {
+        return barChartData;
     }
 
+    public List<WeekActivityDTO> getLineChartData() {
+        return lineChartData;
+    }
 
 }

@@ -2,7 +2,7 @@ package com.kjobrien.strava_visualization.dto;
 
 import java.time.LocalDate;
 
-public class Workout {
+public class Run {
 
     private double distance;
     private long timeInSeconds;
@@ -12,7 +12,7 @@ public class Workout {
     private double topSpeed;
     private double averageHeartRate;
 
-    public Workout(double distance, long timeInSeconds, String type, LocalDate date, double averageSpeed, double topSpeed, double averageHeartRate) {
+    public Run(double distance, long timeInSeconds, String type, LocalDate date, double averageSpeed, double topSpeed, double averageHeartRate) {
         this.distance = distance;
         this.timeInSeconds = timeInSeconds;
         this.type = type;
