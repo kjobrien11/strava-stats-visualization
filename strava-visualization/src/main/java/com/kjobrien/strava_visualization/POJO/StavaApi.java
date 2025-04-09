@@ -25,7 +25,7 @@ public class StavaApi {
 
     //Constants used for retrieving API data
     private final long START_EPOCH =1735707600; // January 1st, 2025
-    private final int ACTIVITIES_PER_PAGE = 50;
+    private final int ACTIVITIES_PER_PAGE = 100;
     private final String STRAVA_API_URL = "https://www.strava.com/api/v3/athlete/activities?after=+"+ START_EPOCH +"&per_page="+ ACTIVITIES_PER_PAGE;
     private final String REFRESH_TOKEN;
     private final String CLIENT_ID;
